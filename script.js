@@ -18,3 +18,22 @@ const svg = d3.select('.svg-container')
   .append('svg')
   .attr('width', width)
   .attr('height', height)
+
+const root = d3.hierarchy(movieDataSet)
+  .sum(d => d.value)
+  .sort((a, b) => b.height - a.height || b.value - a.value)
+
+const treemap = d3.treemap()
+  .size([width, height])
+  .padding(1)
+
+treemap(root)
+
+const nodes = svg.selectAll('rect')
+  .data(root.leaves())
+  .join('rect')
+  .attr('x', d => d.x0)
+  .attr('y', d => d.y0)
+  .attr('width', d => d.x1 - d.x0)
+  .attr('height', d => d.y1 - d.y0)
+  .attr('fill', 'gray')
