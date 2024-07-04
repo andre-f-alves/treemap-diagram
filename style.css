@@ -33,3 +33,12 @@ main {
   background-color: #fff3bf;
   opacity: .7;
 }
+
+.tile {
+  opacity: .8;
+}
+
+.tile-label {
+  transform: translateY(1em);
+  font-size: .8em;
+}

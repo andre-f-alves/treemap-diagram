@@ -11,8 +11,7 @@ const tooltip = d3.select('main')
   .classed('tooltip', true)
 
 const width = 1000
-const height = 700
-const padding = 50
+const height = 600
 
 const svg = d3.select('.svg-container')
   .append('svg')
@@ -26,17 +25,21 @@ const root = d3.hierarchy(movieDataSet)
 const treemap = d3.treemap()
   .size([width, height])
   .padding(1)
-  .tile(d3.treemapBinary)
 
 treemap(root)
 
-const categories = svg.selectAll('g')
+const categoryGroups = svg.selectAll('g')
   .data(root.children)
   .join('g')
   .attr('class', d => d.data.name.toLowerCase())
   .classed('category', true)
 
-const tileContainers = categories.selectAll('g')
+const categories = categoryGroups.nodes().map(node => node.classList[0])
+const colorScheme = d3.schemeCategory10.slice(0, categories.length)
+
+const color = d3.scaleOrdinal(categoryGroups, colorScheme)
+
+const tileContainers = categoryGroups.selectAll('g')
   .data(d => root.leaves().filter(leaf => leaf.data.category === d.data.name))
   .join('g')
   .attr('transform', d => `translate(${d.x0}, ${d.y0})`)
@@ -45,7 +48,10 @@ const tileContainers = categories.selectAll('g')
 tileContainers.append('rect')
   .attr('width', d => d.x1 - d.x0)
   .attr('height', d => d.y1 - d.y0)
-  .attr('fill', 'gray')
+  .attr('data-name', d => d.data.name)
+  .attr('data-category', d => d.data.category)
+  .attr('data-value', d => d.data.value)
+  .attr('fill', d => color(d.data.category))
   .classed('tile', true)
 
 tileContainers.append('text')
