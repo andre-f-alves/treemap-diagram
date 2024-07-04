@@ -26,12 +26,41 @@ main {
   font-size: 1.2em;
 }
 
-.tooltip {
+.tooltip-container {
   position: absolute;
   display: none;
-  padding: 5px;
-  background-color: #fff3bf;
-  opacity: .7;
+  width: 200px;
+  background-color: transparent;
+}
+
+.tooltip-pointer {
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  rotate: 45deg;
+  background-color: #c9c9c9;
+}
+
+.tooltip {
+  position: relative;
+  z-index: 2;
+  display: block;
+  padding: 8px;
+  margin-bottom: 14px;
+  font-size: .9em;
+  background-color: #c9c9c9;
+}
+
+.tooltip-container.active {
+  display: block;
+  transform: translateY(-100%);
+}
+
+.tooltip > span {
+  display: block;
 }
 
 .tile {

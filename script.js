@@ -5,10 +5,15 @@ const movieDataSetEndpoint =
 
 const movieDataSet = await d3.json(movieDataSetEndpoint)
 
-const tooltip = d3.select('main')
-  .insert('div', '.svg-container')
+const tooltipContainer = d3.select('.tooltip-container')
+
+const tooltipPointer = tooltipContainer.append('div')
+  .classed('tooltip-pointer', true)
+
+const tooltip = tooltipContainer.append('div')
   .attr('id', 'tooltip')
   .classed('tooltip', true)
+
 
 const width = 1000
 const height = 600
@@ -45,7 +50,7 @@ const tileContainers = categoryGroups.selectAll('g')
   .attr('transform', d => `translate(${d.x0}, ${d.y0})`)
   .classed('tile-container', true)
 
-tileContainers.append('rect')
+const tiles = tileContainers.append('rect')
   .attr('width', d => d.x1 - d.x0)
   .attr('height', d => d.y1 - d.y0)
   .attr('data-name', d => d.data.name)
@@ -56,4 +61,21 @@ tileContainers.append('rect')
 
 tileContainers.append('text')
   .classed('tile-label', true)
-  .text(d => d.data.name.trim())
+
+tiles.on('mouseover', (event, d) => {
+  const x = event.target.getBoundingClientRect().x + scrollX
+  const y = event.target.getBoundingClientRect().y + scrollY
+
+  tooltipContainer.classed('active', true)
+    .style('left', x + 'px')
+    .style('top', y + 'px')
+
+  tooltip.attr('data-value', d.data.value)
+    .html(`
+      <span><strong>Movie:</strong> ${d.data.name.trim()}</span>
+      <span><strong>Category:</strong> ${d.data.category}</span>
+      <span><strong>Value:</strong> ${d.data.value}</span>
+    `)
+})
+
+tiles.on('mouseout', () => tooltipContainer.classed('active', false))
