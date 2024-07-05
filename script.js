@@ -7,33 +7,33 @@ const movieDataSet = await d3.json(movieDataSetEndpoint)
 
 const tooltipContainer = d3.select('.tooltip-container')
 
-const tooltipPointer = tooltipContainer.append('div')
-  .classed('tooltip-pointer', true)
-
 const tooltip = tooltipContainer.append('div')
   .attr('id', 'tooltip')
   .classed('tooltip', true)
 
+tooltipContainer.append('div')
+  .classed('tooltip-pointer', true)
 
-const width = 1000
-const height = 600
+const WIDTH = 1000
+const HEIGHT = 600
 
-const svg = d3.select('.svg-container')
+const treemapSVG = d3.select('.svg-container')
   .append('svg')
-  .attr('width', width)
-  .attr('height', height)
+  .attr('width', WIDTH)
+  .attr('height', HEIGHT)
+  .classed('treemap', true)
 
 const root = d3.hierarchy(movieDataSet)
   .sum(d => d.value)
   .sort((a, b) => b.height - a.height || b.value - a.value)
 
 const treemap = d3.treemap()
-  .size([width, height])
+  .size([WIDTH, HEIGHT])
   .padding(1)
 
 treemap(root)
 
-const categoryGroups = svg.selectAll('g')
+const categoryGroups = treemapSVG.selectAll('g')
   .data(root.children)
   .join('g')
   .attr('class', d => d.data.name.toLowerCase())
@@ -79,3 +79,33 @@ tiles.on('mouseover', (event, d) => {
 })
 
 tiles.on('mouseout', () => tooltipContainer.classed('active', false))
+
+const LEGEND_HEIGHT = 200
+const LEGEND_PADDING = 50
+const LEGEND_RECT_SIZE = 15
+
+const legendInnerWidth =  WIDTH - 2 * LEGEND_PADDING
+const legendInnerHeight =  LEGEND_HEIGHT - 2 * LEGEND_PADDING
+const elementsPerRow = 4
+
+const legendSVG = d3.select('.svg-container')
+  .append('svg')
+  .attr('width', WIDTH)
+  .attr('height', LEGEND_HEIGHT)
+  .attr('id', 'legend')
+  .classed('legend', true)
+
+const legendElements = legendSVG.selectAll('g')
+  .data(categories)
+  .join('g')
+  .attr('transform', (_, i) => `translate(${i % elementsPerRow * legendInnerWidth / elementsPerRow + LEGEND_PADDING}, ${Math.floor(i / elementsPerRow) * legendInnerHeight + LEGEND_PADDING})`)
+
+legendElements.append('rect')
+  .attr('width', LEGEND_RECT_SIZE)
+  .attr('height', LEGEND_RECT_SIZE)
+  .attr('fill', d => color(d))
+  .classed('legend-item', true)
+
+legendElements.append('text')
+  .classed('legend-text', true)
+  .text(d => d[0].toUpperCase() + d.slice(1))
