@@ -61,6 +61,41 @@ const tiles = tileContainers.append('rect')
 
 tileContainers.append('text')
   .classed('tile-label', true)
+  .each(function(d) {
+    const width = d.x1 - d.x0
+    const words = d.data.name.trim().split(' ')
+
+    const x = 1
+    let y = 0
+    
+    let tspan = d3.select(this)
+      .append('tspan')
+      .attr('x', x)
+      .attr('y', y)
+
+    let line = []
+
+    while (words.length > 0) {
+      let word = words.shift()
+
+      line.push(word)
+      tspan.text(line.join(' '))
+
+      if (tspan.node().getComputedTextLength() > width) {
+        line.pop()
+        tspan.text(line.join(' '))
+
+        line = [word]
+
+        y += 15
+        tspan = d3.select(this)
+          .append('tspan')
+          .text(line)
+          .attr('x', x)
+          .attr('y', y)
+      }
+    }
+  })
 
 tiles.on('mouseover', (event, d) => {
   const x = event.target.getBoundingClientRect().x + scrollX
@@ -80,17 +115,18 @@ tiles.on('mouseover', (event, d) => {
 
 tiles.on('mouseout', () => tooltipContainer.classed('active', false))
 
+const LEGEND_WIDTH = 800
 const LEGEND_HEIGHT = 200
 const LEGEND_PADDING = 50
 const LEGEND_RECT_SIZE = 15
 
-const legendInnerWidth =  WIDTH - 2 * LEGEND_PADDING
+const legendInnerWidth = LEGEND_WIDTH - 2 * LEGEND_PADDING
 const legendInnerHeight =  LEGEND_HEIGHT - 2 * LEGEND_PADDING
 const elementsPerRow = 4
 
 const legendSVG = d3.select('.svg-container')
   .append('svg')
-  .attr('width', WIDTH)
+  .attr('width', LEGEND_WIDTH)
   .attr('height', LEGEND_HEIGHT)
   .attr('id', 'legend')
   .classed('legend', true)

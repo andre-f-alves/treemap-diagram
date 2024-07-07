@@ -86,6 +86,7 @@ main {
 
 .legend {
   display: block;
+  margin: auto;
 }
 
 .legend-text {
